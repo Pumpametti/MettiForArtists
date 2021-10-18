@@ -1,3 +1,4 @@
+
 // 88b           d88  88888888888  888888888888  888888888888  88     88888888888  ,ad8888ba,    88888888ba             db         88888888ba  888888888888  88   ad88888ba  888888888888  ad88888ba   
 // 888b         d888  88                88            88       88     88          d8"'    `"8b   88      "8b           d88b        88      "8b      88       88  d8"     "8b      88      d8"     "8b  
 // 88`8b       d8'88  88                88            88       88     88         d8'        `8b  88      ,8P          d8'`8b       88      ,8P      88       88  Y8,              88      Y8,          
@@ -8,7 +9,7 @@
 // 88     `8'     88  88888888888       88            88       88     88           `"Y8888Y"'    88      `8b     d8'          `8b  88      `8b      88       88   "Y88888P"       88       "Y88888P"   
                                                                                                                                                                                                     
 //MettiForArtists is an open-source smart contract started by Pumpametti that allows artists with limited or no technical background to mint NFT artworks on their own custom contracts instead of using OpenSea Storefront Contract.
-//With MettiForArtists you can mint unique artworks or art editions all under your artist name, set irrevocable artwork links for your unique artworks or editions, also set artwork royalties from 0% to 20%. 
+//With MettiForArtists you can mint unique artworks under your artist name, set irrevocable artwork links for your unique artworks, also set artwork royalties.
 //More detailed tutorial and peer help will be availalble in Pumpametti Discord dev-Chat. 
 //No artist should starve due to technical barrier.
 //https://linktr.ee/Pumpametti
@@ -35,7 +36,6 @@ contract MettiForArtists is ERC721, ERC721URIStorage, ERC721Burnable, ERC721Enum
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
-    Counters.Counter private _editionCounter;
     string private _baseURIextended;
     uint256 private _MAX_UniqueWork = 2000000;
     
@@ -43,7 +43,7 @@ contract MettiForArtists is ERC721, ERC721URIStorage, ERC721Burnable, ERC721Enum
 
     constructor() ERC721("MettiForArtists", "MFA") {}
 
-    function mint(
+    function mintUniqueWork(
         address to,
         string memory _tokenURI,
         address payable receiver,
@@ -60,41 +60,8 @@ contract MettiForArtists is ERC721, ERC721URIStorage, ERC721Burnable, ERC721Enum
         _tokenIdCounter.increment();
     }
 
-    function mintEditions(
-        address to,
-        string memory _tokenURI,
-        uint256 count,
-        address payable receiver,
-        uint256 basisPoints
-    ) public onlyOwner {
-        require(basisPoints < 10000, "Total royalties should not exceed 100%");
-        require(count < 501, "Max of 500 editions");
-        require(count > 1, "Must be more than 1 token per edition");
-
-        uint256 tokenId = getNextEditionId();
-        _mintEditions(to, tokenId, count, _tokenURI, receiver, basisPoints);
-        _editionCounter.increment();
-    }
-
     function getNextTokenId() public view returns (uint256) {
         return _tokenIdCounter.current() + 1;
-    }
-
-    function getNextEditionId() public view returns (uint256) {
-        return ((_editionCounter.current() + 1) * _MAX_UniqueWork) + 1;
-    }
-
-    function _mintEditions(
-        address to,
-        uint256 tokenId,
-        uint256 count,
-        string memory _tokenURI,
-        address payable receiver,
-        uint256 basisPoints
-    ) internal {
-        for (uint256 i = 0; i < count; i++) {
-            _mintUniqueWork(to, tokenId + i, _tokenURI, receiver, basisPoints);
-        }
     }
 
     function _mintUniqueWork(
